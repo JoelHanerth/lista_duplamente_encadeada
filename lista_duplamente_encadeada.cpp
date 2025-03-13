@@ -48,23 +48,28 @@ void insere(TLista *L, int numero){
 				if(atual->ante == NULL){
 					//inserir no in�cio da lista.
 					novo->prox = L->inicio;
+					L->inicio->ante = novo;
 					L->inicio = novo;	
+
 				} else {
 					//inserir no meio da Lista.
-				    atual->ante = novo;		
+					novo->ante = atual->ante;
 				    novo->prox = atual;					
+				    atual->ante->prox = novo;
+					atual->ante = novo;
 				}
 
 				inserido = 1;
 				break;
 			}//if
-			novo->ante = atual;
+			// novo->ante = atual;
 			atual = atual->prox;	
 		}//while
 		
 		if(!inserido){
 			//inserir novo no fim da lista.
 			L->fim->prox = novo;
+			novo->ante= L->fim;
 			L->fim = novo;
 		}//if
 	}
@@ -85,14 +90,46 @@ void imprimeLista(TLista L){
 	printf("\n\n");
 	system("PAUSE");
 }
+
+
+//===============================================================
+
+void print_list(TLista list) {
+    TRegistro *current = list.inicio;
+
+    printf("[");
+    while (current != NULL) {
+        printf("%d", current->valor);
+        if (current->prox != NULL) {
+            printf(", ");
+        }
+        current = current->prox;
+    }
+    printf("]\n");
+}
+
+void print_list_reverse(TLista list) {
+    TRegistro *current = list.fim;
+
+    printf("[");
+    while (current != NULL) {
+        printf("%d", current->valor);
+        if (current->ante != NULL) {
+            printf(", ");
+        }
+        current = current->ante;
+    }
+    printf("]\n");
+}
+
+
 //===============================================================
 void exclue(TLista *L, int numero){
-	TRegistro *atual, *anterior;
+	TRegistro *atual;
 	int encontrado = 0;
 	
 	//busca por elemento com valor = numero...
 	atual = L->inicio;
-	anterior = NULL;
 	
 	while(atual != NULL){
 		if(atual->valor == numero)	{
@@ -104,27 +141,29 @@ void exclue(TLista *L, int numero){
 				L->fim = NULL;
 			} else if(atual == L->inicio){
 				//Excluindo elemento no in�cio da lista.
-				L->inicio = atual->prox;	
+				L->inicio = atual->prox;
+				L->inicio->ante = NULL;
+					
 			} else if(atual == L->fim){
 				//Excluindo o �ltimo elemento.
-				L->fim = anterior;
+				L->fim = L->fim->ante;
 				L->fim->prox = NULL;
 			} else {
 				//Excluindo um elemento no meio da Lista.
-				anterior->prox = atual->prox;
+				atual->ante->prox = atual->prox;
+				atual->prox->ante = atual->ante;
 			}//if
 			
 			free(atual); //Elimina��o do registro.
 			break; //abandona while...
 		}//if
 		
-		anterior = atual;
 		atual= atual->prox;
 		
 	}//while
 	
 	if(encontrado){
-		printf("\n\t\tRegistro EXCLUIDO com  SUCESSO!\n");
+		printf("\n\t\tRegistro com o valor %d EXCLUIDO com  SUCESSO!\n",numero);
 	} else {
 		printf("\n\t\tRegistro NAO encontrado.\n\tImpossivel EXCLUIR!\n\t");
 		printf("VALOR = %d\n", numero);
@@ -152,12 +191,22 @@ int main(){
 	insere(&lista, 13);
 	insere(&lista, 11);
 	
+	print_list(lista);
+	print_list_reverse(lista);
 	imprimeLista(lista);
 	
 	exclue(&lista, 4); //excluindo elemento no in�cio da lista
+	print_list(lista);
+	print_list_reverse(lista);
 	exclue(&lista, 13); //excluindo o �ltimo elemento da lista
+	print_list(lista);
+	print_list_reverse(lista);
 	exclue(&lista, 9); //excluindo elemento no meio da lista
+	print_list(lista);
+	print_list_reverse(lista);
 	exclue(&lista, 21); //tentando excluir elemento inexistente na lista
+	print_list(lista);
+	print_list_reverse(lista);
 	
 	exclue(&lista, 7);
 	exclue(&lista, 8);
